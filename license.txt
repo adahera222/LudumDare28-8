@@ -1,0 +1,13 @@
+This project, all code, and all assets are currently copyright 2013 Steve Richey.
+
+However, feel free to:
+* Fork and view this repository
+* Use snippets of code from this project in your own work
+
+Please do NOT:
+* Share this project without attribution
+* Claim this project's contents as your own
+
+This is just a temporary license until I decide what to do with this project, which will be sometime after the jam is over.
+
+Obviously I do not claim a copyright in any way on Haxe, HaxePunk, OpenFL, or FlashDevelop.
