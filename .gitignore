@@ -1,0 +1,6 @@
+# Ignored files.
+export/
+misc/
+*.keystore
+*.privatekey
+*.wav

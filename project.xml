@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="LudumDare28" package="com.example.app" version="1.0.0" company="" />
+	
+ 	<app file="Main" main="Main" path="export" />
+	
+	<window fps="30" background="0x333333" />
+	<window width="640" height="480" resizable="true" unless="mobile" />
+	<window fullscreen="true" if="mobile" />
+	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+	
+	<source path="source" />
+	
+	<haxelib name="openfl" />
+	<haxelib name="openfl-bitfive" if="html5" />
+	<haxelib name="HaxePunk" />
+	
+	<assets path="assets/images" rename="images" include="*.png" />
+	
+	<assets path="assets/sounds" unless="flash">
+		<sound path="example.ogg" id="example" />
+	</assets>
+	
+	<assets path="assets/sounds" if="flash">
+		<sound path="example.mp3" id="example" />
+	</assets>
+	
+	<assets path="assets/font" rename="font" include="*.ttf" />
+	
+	<icon path="assets/HaxePunk.svg" />
+</project>
