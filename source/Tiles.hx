@@ -2,46 +2,26 @@ package;
 
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.Tilemap;
+import com.haxepunk.Mask;
 import com.haxepunk.masks.Grid;
+import com.haxepunk.tmx.TmxEntity;
+import com.haxepunk.tmx.TmxMap;
 
 class Tiles extends Entity {
 	/**
 	 * Create a tiled map.
 	 * 
-	 * @param	TileImage	The image to use for the tilemap.
-	 * @param	TileSize	The width and/or height of the tilemap, in pixels.
+	 * @param	MapPath		The image to use for the tilemap.
 	 */
-	public function new( TileImage:String, TileSize:Int ) {
+	public function new( MapPath:String, TileSet:String ) {
 		super( 0, 0 );
 		
-		var tilemap:Tilemap = new Tilemap( TileImage, 20 * 10, 20 * 10, 20, 20 );
-		var grid:Grid = new Grid( tilemap.width, tilemap.height, tilemap.tileWidth, tilemap.tileHeight, 0, 0 );
+		var entity:TmxEntity = new TmxEntity( MapPath );
+		entity.loadGraphic( TileSet, [ "collision" ] );
+		entity.loadMask( "collision", "walls" );
 		
-		// Fill the tilemap and grid programatically
-		
-		var map:Array<Array<Int>> = [ 	[ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-										[ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] ];
-		
-		for ( i in 0...tilemap.columns ) {
-			for ( j in 0...tilemap.rows ) {
-				var tile = map[j][i];
-				if (tile != 0) {
-					tilemap.setTile(i, j, tile);
-					grid.setTile(i, j, true);
-				}
-			}
-		}
-		
-		graphic = tilemap;
-		mask = grid;
+		graphic = entity.graphic;
+		mask = entity.mask;
 		type = "solid";
 	}
 }

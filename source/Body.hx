@@ -37,7 +37,7 @@ class Body extends Entity {
 	}
 	
 	override public function moveCollideY( e:Entity ):Bool {
-		if ( velocity.y * HXP.sign( gravity.y ) > 0) {
+		if ( velocity.y * HXP.sign( gravity.y ) > 0 ) {
 			_onGround = true;
 		}
 		
@@ -52,7 +52,7 @@ class Body extends Entity {
 		return true;
 	}
 	
-	public override function moveCollideX( e:Entity ):Bool {
+	override public function moveCollideX( e:Entity ):Bool {
 		velocity.x = 0;
 		velocity.y *= friction.y;
 		

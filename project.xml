@@ -14,6 +14,7 @@
 	<haxelib name="openfl" />
 	<haxelib name="openfl-bitfive" if="html5" />
 	<haxelib name="HaxePunk" />
+	<haxelib name="HaxePunkTmx" />
 	
 	<assets path="assets/images" rename="images" include="*.png" />
 	
@@ -26,6 +27,7 @@
 	</assets>
 	
 	<assets path="assets/font" rename="font" include="*.ttf" />
+	<assets path="assets/maps" rename="maps" include="*.tmx" />
 	
 	<icon path="assets/HaxePunk.svg" />
 </project>
