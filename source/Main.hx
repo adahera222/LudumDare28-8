@@ -8,6 +8,7 @@ class Main extends Engine {
 		#if debug
 		HXP.console.enable();
 		#end
+		//HXP.resize( 320, 240 );
 		HXP.scene = new GameScene();
 	}
 	
