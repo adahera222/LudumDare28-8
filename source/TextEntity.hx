@@ -18,6 +18,14 @@ class TextEntity extends Entity {
 		return _text.text;
 	}
 	
+	public var color(null, set):Int;
+	
+	private function set_color( NewColor:Int ):Int {
+		_text.color = NewColor;
+		
+		return _text.color;
+	}
+	
 	public function new( Content:String, Size:Int = 8 ) {
 		_text = new Text( Content );
 		_text.size = Size;

@@ -18,6 +18,7 @@ class GameScene extends Scene {
 	private var _enemies:Array<Enemy>;
 	private var _particles:Particles;
 	private var _vines:Array<Box>;
+	private var _treasures:Array<Treasure>;
 	
 	override public function begin():Void {
 		Reg.GS = this;
@@ -29,8 +30,20 @@ class GameScene extends Scene {
 		
 		_enemies = new Array<Enemy>();
 		
-		for ( e in _tileMap.enemyPositions ) {
-			var enemy:Enemy = new Enemy( e.x, e.y, "images/monster.png" );
+		for ( e in _tileMap.spikePositions ) {
+			var enemy:Enemy = new Enemy( e.x, e.y, "images/spike.png", 80, 80 );
+			_enemies.push( enemy );
+			add( enemy );
+		}
+		
+		for ( e in _tileMap.spiderPositions ) {
+			var enemy:Enemy = new Enemy( e.x, e.y, "images/spider.png", 48, 40 );
+			_enemies.push( enemy );
+			add( enemy );
+		}
+		
+		for ( e in _tileMap.ghostPositions ) {
+			var enemy:Enemy = new Enemy( e.x, e.y, "images/ghost.png", 96, 112 );
 			_enemies.push( enemy );
 			add( enemy );
 		}
@@ -44,9 +57,20 @@ class GameScene extends Scene {
 			_vines.push( vine );
 		}
 		
+		// Set up treasures
+		
+		_treasures = new Array<Treasure>();
+		
+		for ( e in _tileMap.treasurePositions ) {
+			var treas:Treasure = new Treasure( e.x, e.y );
+			_treasures.push( treas );
+			add( treas );
+		}
+		
 		Reg.PARTICLES = new Particles();
 		Reg.LASERBEAM = new Laserbeam();
 		Reg.BLASTER = new Entity( 0, 0, new Spritemap( "images/blaster.png" ) );
+		Reg.BLASTER.layer = Reg.LAYER_ENEMY;
 		Reg.BLASTER.visible = false;
 		
 		add( _tileMap );
@@ -61,6 +85,22 @@ class GameScene extends Scene {
 	override public function update():Void {
 		HXP.camera.x = _player.x - HXP.halfWidth;
 		HXP.camera.y = _player.y - HXP.halfHeight;
+		
+		if ( HXP.camera.x < 0 ) {
+			HXP.camera.x = 0;
+		}
+		
+		if ( HXP.camera.x > _tileMap.width - 640 ) {
+			HXP.camera.x = _tileMap.width - 640;
+		}
+		
+		if ( HXP.camera.y < 0 ) {
+			HXP.camera.y = 0;
+		}
+		
+		if ( HXP.camera.y > _tileMap.height - 480 ) {
+			HXP.camera.y = _tileMap.height - 480;
+		}
 		
 		for ( vine in _vines ) {
 			if ( vine.collideWith( _player ) ) {

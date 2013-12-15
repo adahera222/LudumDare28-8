@@ -15,10 +15,11 @@ class Enemy extends Body {
 	inline static private var MOVE_SPEED:Float = 1.0;
 	inline static private var JUMP_HEIGHT:Float = 20.0;
 	
-	override public function new( X:Float, Y:Float, ImagePath:String ):Void {
-		super( X, Y, ImagePath, 40, 40 );
+	override public function new( X:Float, Y:Float, ImagePath:String, Width:Int, Height:Int ):Void {
+		super( X, Y, ImagePath, Width, Height );
 		
-		setHitbox( 40, 40, 0, 0 );
+		setHitbox( Width, Height, 0, 0 );
+		layer = Reg.LAYER_ENEMY;
 		
 		// Physics
 		

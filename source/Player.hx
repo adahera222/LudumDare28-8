@@ -38,6 +38,8 @@ class Player extends Body {
 		
 		super( X, Y, _spriteMap, 40, 80 );
 		
+		layer = Reg.LAYER_PLAYER;
+		
 		setHitbox( 40, 80, 0, 0 );
 		
 		// Physics
@@ -63,6 +65,12 @@ class Player extends Body {
 	
 	override public function update():Void {
 		acceleration.x = acceleration.y = 0;
+		
+		#if debug
+		if ( Input.check( Key.Q ) ) {
+			velocity.y = -100;
+		}
+		#end
 		
 		if ( Input.check( "left" ) ) {
 			if ( _spriteMap.frame != 1 ) {
