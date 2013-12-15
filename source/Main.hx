@@ -9,7 +9,7 @@ class Main extends Engine {
 		HXP.console.enable();
 		#end
 		//HXP.resize( 320, 240 );
-		HXP.scene = new GameScene();
+		HXP.scene = new MenuScene();
 	}
 	
 	static public function main() { new Main(); }

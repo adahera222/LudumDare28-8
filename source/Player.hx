@@ -5,6 +5,7 @@ import com.haxepunk.Graphic;
 import com.haxepunk.graphics.Emitter;
 import com.haxepunk.graphics.Spritemap;
 import com.haxepunk.HXP;
+import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 
@@ -14,16 +15,28 @@ import com.haxepunk.utils.Key;
  * Because I don't know what I'm doing
  */
 class Player extends Body {
+	public var canClimb:Bool = false;
+	private var _spriteMap:Spritemap;
+	private var _blaster:Sfx;
+	
 	inline static private var MOVE_SPEED:Float = 1.0;
 	inline static private var JUMP_HEIGHT:Float = 10.0;
 	inline static private var GRAVITY:Float = 0.5;
 	inline static private var VELOCITY_MAX_X:Float = 4;
 	inline static private var VELOCITY_MAX_Y:Float = 20;
 	inline static private var FRICTION_X:Float = 0.75;
-	inline static private var FRICTION_Y:Float = 0.0;
+	inline static private var FRICTION_Y:Float = 1.0;
 	
-	override public function new( X:Int, Y:Int ):Void {
-		super( X, Y, "images/jack.png", 40, 80 );
+	override public function new( X:Float, Y:Float ):Void {
+		_spriteMap = new Spritemap( "images/jack.png", 40, 80 );
+		_spriteMap.add( "idle", [0] );
+		_spriteMap.add( "duck", [1] );
+		_spriteMap.add( "jump", [3] );
+		_spriteMap.add( "run", [2, 3], 8 );
+		_spriteMap.add( "blaster", [4] );
+		_spriteMap.add( "arrow", [5] );
+		
+		super( X, Y, _spriteMap, 40, 80 );
 		
 		setHitbox( 40, 80, 0, 0 );
 		
@@ -42,27 +55,98 @@ class Player extends Body {
 		Input.define( "up", [ Key.UP ] );
 		Input.define( "down", [ Key.DOWN ] );
 		Input.define( "space", [ Key.SPACE ] );
+		
+		// Sound
+		
+		_blaster = new Sfx( "blaster" );
 	}
 	
 	override public function update():Void {
 		acceleration.x = acceleration.y = 0;
 		
 		if ( Input.check( "left" ) ) {
-			acceleration.x = -MOVE_SPEED;
+			if ( _spriteMap.frame != 1 ) {
+				acceleration.x = -MOVE_SPEED;
+			} else {
+				if ( !_spriteMap.flipped ) {
+					_spriteMap.flipped = true;
+				}
+			}
 		}
 		
 		if ( Input.check( "right" ) ) {
-			acceleration.x = MOVE_SPEED;
+			if ( _spriteMap.frame != 1 ) {
+				acceleration.x = MOVE_SPEED;
+			} else {
+				if ( _spriteMap.flipped ) {
+					_spriteMap.flipped = false;
+				}
+			}
 		}
 		
-		if ( Input.pressed( "up" ) && onGround ) {
-			acceleration.y = -JUMP_HEIGHT;
+		if ( onGround ) {
+			if ( Input.check( "left" ) ) {
+				_spriteMap.play( "run" );
+			}
+			
+			if ( Input.check( "right" ) ) {
+				_spriteMap.play( "run" );
+			}
+			
+			if ( acceleration.x == 0 ) {
+				_spriteMap.play( "idle" );
+			}
+			
+			if ( Input.check( "down" ) ) {
+				_spriteMap.play( "duck" );
+			}
+			
+			if ( Input.pressed( "up" ) ) {
+				_spriteMap.play( "jump" );
+				acceleration.y = -JUMP_HEIGHT;
+			}
+		} else {
+			if ( Input.check( "up" ) && canClimb ) {
+				acceleration.y = -MOVE_SPEED;
+				
+				if ( velocity.y < -velocityMax.x ) {
+					velocity.y = -velocityMax.x;
+				}
+			}
 		}
 		
-		if ( Input.pressed( "space" ) ) {
-			Reg.PARTICLES.smoke( x, y );
-			Reg.PARTICLES.blaster( x, y );
+		if ( Input.check( "space" ) ) {
+			_spriteMap.play( "blaster" );
+			
+			var posX:Int = 0;
+			var posY:Int = Std.int( y + 27 );
+			var emitX:Int = 0;
+			var emitY:Int = posY + 5;
+			
+			if ( !_spriteMap.flipped ) {
+				posX = Std.int( x + 35 );
+				emitX = posX + 27;
+			} else {
+				posX = Std.int( x - 35 );
+				emitX =  posX;
+			}
+			
+			Reg.BLASTER.moveTo( posX, posY );
+			Reg.BLASTER.visible = true;
+			
+			if ( Input.pressed( "space" ) ) {
+				Reg.PARTICLES.smoke( emitX, emitY );
+				Reg.PARTICLES.blaster( emitX, emitY );
+				Reg.LASERBEAM.beam( emitX, emitY );
+				_blaster.play();
+			}
+			
+			acceleration.x = 0;
+		} else {
+			Reg.BLASTER.visible = false;
 		}
+		
+		canClimb = false;
 		
 		super.update();
 	}

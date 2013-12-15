@@ -4,7 +4,7 @@
 	
  	<app file="Main" main="Main" path="export" />
 	
-	<window fps="30" background="0x333333" />
+	<window fps="30" background="0x00AAFF" />
 	<window width="640" height="480" resizable="true" unless="mobile" />
 	<window fullscreen="true" if="mobile" />
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
@@ -19,11 +19,13 @@
 	<assets path="assets/images" rename="images" include="*.png" />
 	
 	<assets path="assets/sounds" unless="flash">
-		<sound path="example.ogg" id="example" />
+		<sound path="title.ogg" id="title" />
+		<sound path="blaster.ogg" id="blaster" />
 	</assets>
 	
 	<assets path="assets/sounds" if="flash">
-		<sound path="example.mp3" id="example" />
+		<sound path="title.mp3" id="title" />
+		<sound path="blaster.mp3" id="blaster" />
 	</assets>
 	
 	<assets path="assets/font" rename="font" include="*.ttf" />

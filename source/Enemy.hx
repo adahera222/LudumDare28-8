@@ -15,10 +15,10 @@ class Enemy extends Body {
 	inline static private var MOVE_SPEED:Float = 1.0;
 	inline static private var JUMP_HEIGHT:Float = 20.0;
 	
-	override public function new( X:Int, Y:Int ):Void {
-		super( X, Y, "images/enemy.png", 40, 80 );
+	override public function new( X:Float, Y:Float, ImagePath:String ):Void {
+		super( X, Y, ImagePath, 40, 40 );
 		
-		setHitbox( 40, 80, 0, 0 );
+		setHitbox( 40, 40, 0, 0 );
 		
 		// Physics
 		

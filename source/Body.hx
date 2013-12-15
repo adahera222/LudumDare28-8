@@ -18,15 +18,32 @@ class Body extends Entity {
 		return _onGround;
 	}
 	
+	public var fx(get, null):Int;
+	
+	private function get_fx():Int {
+		return Std.int( x + width );
+	}
+	
+	public var fy(get, null):Int;
+	
+	private function get_fy():Int {
+		return Std.int( y + height );
+	}
+	
 	public static var solid:String = "solid";
 	
 	private var _onGround:Bool = false;
 	private var _sprite:Spritemap;
 	
-	public function new( X:Int, Y:Int, SpritePath:String, Width:Int, Height:Int ) {
-		super( X, Y );
+	public function new( X:Float, Y:Float, Graphic:Dynamic, Width:Int, Height:Int ) {
+		super( Std.int( X ), Std.int( Y ) );
 		
-		_sprite = new Spritemap( SpritePath, Width, Height );
+		if ( Std.is( Graphic, String ) ) {
+			_sprite = new Spritemap( Graphic, Width, Height );
+		} else if ( Std.is( Graphic, Spritemap ) ) {
+			_sprite = Graphic;
+		}
+		
 		graphic = _sprite;
 		
 		acceleration = new Point();
