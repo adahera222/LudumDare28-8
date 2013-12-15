@@ -29,6 +29,10 @@ class Tiles extends Entity {
 	
 	public var treasurePositions(default, null):Array<Point>;
 	
+	// The level exit
+	
+	public var exit(default, null):Box;
+	
 	/**
 	 * Create a tiled map.
 	 * 
@@ -66,6 +70,8 @@ class Tiles extends Entity {
 					vineAreas.push( b );
 				case "treasure":
 					treasurePositions.push( new Point( object.x, object.y ) );
+				case "exit":
+					exit = new Box( object.x, object.y, object.width, object.height ); 
 			}
 		}
 		

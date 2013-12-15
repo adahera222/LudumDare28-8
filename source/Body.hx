@@ -63,18 +63,18 @@ class Body extends Entity {
 		velocity.x *= friction.x;
 		
 		if ( Math.abs( velocity.x ) < 0.5 ) {
-			velocity.x = 0;
+			//velocity.x = 0;
 		}
 		
 		return true;
 	}
 	
 	override public function moveCollideX( e:Entity ):Bool {
-		velocity.x = 0;
-		velocity.y *= friction.y;
+		//velocity.x = 0;
+		//velocity.y *= friction.y;
 		
 		if ( Math.abs( velocity.y ) < 1 ) {
-			velocity.y = 0;
+			//velocity.y = 0;
 		}
 		
 		return true;

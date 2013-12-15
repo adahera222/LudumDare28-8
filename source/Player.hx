@@ -18,6 +18,7 @@ class Player extends Body {
 	public var canClimb:Bool = false;
 	private var _spriteMap:Spritemap;
 	private var _blaster:Sfx;
+	private var _drawTime:Float = 0.0;
 	
 	inline static private var MOVE_SPEED:Float = 1.0;
 	inline static private var JUMP_HEIGHT:Float = 10.0;
@@ -57,6 +58,7 @@ class Player extends Body {
 		Input.define( "up", [ Key.UP ] );
 		Input.define( "down", [ Key.DOWN ] );
 		Input.define( "space", [ Key.SPACE ] );
+		Input.define( "c", [ Key.C ] );
 		
 		// Sound
 		
@@ -130,22 +132,27 @@ class Player extends Body {
 			var posY:Int = Std.int( y + 27 );
 			var emitX:Int = 0;
 			var emitY:Int = posY + 5;
+			var direction:Int = 15;
+			var directionRange:Int = -30;
 			
 			if ( !_spriteMap.flipped ) {
 				posX = Std.int( x + 35 );
 				emitX = posX + 27;
 			} else {
-				posX = Std.int( x - 35 );
+				posX = Std.int( x - 22 );
 				emitX =  posX;
+				direction = 165;
+				directionRange = 30;
 			}
 			
 			Reg.BLASTER.moveTo( posX, posY );
+			Reg.BLASTER.faceRight( _spriteMap.flipped );
 			Reg.BLASTER.visible = true;
 			
 			if ( Input.pressed( "space" ) ) {
-				Reg.PARTICLES.smoke( emitX, emitY );
-				Reg.PARTICLES.blaster( emitX, emitY );
-				Reg.LASERBEAM.beam( emitX, emitY );
+				Reg.PARTICLES.smoke( emitX, emitY, direction );
+				Reg.PARTICLES.blaster( emitX, emitY, direction + directionRange );
+				Reg.LASERBEAM.beam( emitX, emitY, direction + Std.int( directionRange / 2 ) );
 				_blaster.play();
 			}
 			
@@ -154,8 +161,43 @@ class Player extends Body {
 			Reg.BLASTER.visible = false;
 		}
 		
+		if ( Input.pressed( "c" ) ) {
+			HXP.timeFlag();
+		}
+		
+		if ( Input.check( "c" ) ) {
+			_spriteMap.play( "arrow" );
+			acceleration.x = 0;
+			Reg.ARROW.y = y + 30;
+			
+			if ( _spriteMap.flipped ) {
+				Reg.ARROW.x = x - 5;
+			} else {
+				Reg.ARROW.x = x + 20;
+			}
+			
+			Reg.ARROW.flipped = _spriteMap.flipped;
+			Reg.ARROW.visible = true;
+			Reg.ARROW.damage = 5;
+		}
+		
+		if ( Input.released( "c" ) ) {
+			var sign:Int = 1;
+			
+			if ( _spriteMap.flipped ) {
+				sign = -1;
+			}
+			
+			Reg.ARROW.velocity.x = sign * HXP.timeFlag() * 20;
+		}
+		
 		canClimb = false;
 		
 		super.update();
+	}
+	
+	public function hurt():Void {
+		velocity.y -= 5;
+		velocity.x -= 5;
 	}
 }

@@ -19,12 +19,19 @@ class Laserbeam extends Entity {
 		_emitter.setAlpha( "beam", 1, 0.5 );
 		_emitter.setGravity( "beam", 0 );
 		
+		layer = Reg.LAYER_PARTICLE;
 		graphic = _emitter;
 	}
 	
-	public function beam( X:Float, Y:Float, NumParticles:Int = 1 ):Void {
+	public function beam( X:Float, Y:Float, Direction:Int = 0, NumParticles:Int = 1 ):Void {
+		_emitter.setMotion( "beam", Direction, 512, 2, 0, 0, 0 );
+		
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "beam", X, Y );
 		}
+	}
+	
+	override public function update():Void {
+		
 	}
 }

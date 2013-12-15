@@ -26,7 +26,7 @@ class Particles extends Entity {
 		_emitter.setGravity( "explosion", 0.5 );
 		
 		_emitter.newType( "smoke", [1] );
-		_emitter.setMotion( "smoke", 0, 100, 5, 45, -40, 1, Ease.quadOut );
+		_emitter.setMotion( "smoke", 15, 50, 5, 15, -40, 1, Ease.quadOut );
 		_emitter.setAlpha( "smoke", 1, 0 );
 		_emitter.setGravity( "smoke", -0.5 );
 		
@@ -35,22 +35,31 @@ class Particles extends Entity {
 		_emitter.setAlpha( "blaster", 1, 0 );
 		_emitter.setGravity( "blaster", 0.25 );
 		
+		layer = Reg.LAYER_PARTICLE;
 		graphic = _emitter;
 	}
 	
-	public function explosion( X:Float, Y:Float, NumParticles:Int = 32 ):Void {
+	public function explosion( X:Float, Y:Float, NumParticles:Int = 64 ):Void {
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "explosion", X, Y );
 		}
 	}
 	
-	public function smoke( X:Float, Y:Float, NumParticles:Int = 16 ):Void {
+	public function smoke( X:Float, Y:Float, Direction:Int = 15, NumParticles:Int = 16 ):Void {
+		_emitter.setMotion( "smoke", Direction, 50, 5, 15, -40, 1, Ease.quadOut );
+		
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "smoke", X, Y );
 		}
 	}
 	
-	public function blaster ( X:Float, Y:Float, NumParticles:Int = 4 ):Void {
+	public function blaster ( X:Float, Y:Float, Direction:Int = -15, NumParticles:Int = 4 ):Void {
+		if ( Direction < 0 ) {
+			_emitter.setMotion( "blaster", Direction, 64, 1, 30, 32, 0.25, Ease.quadOut );
+		} else {
+			_emitter.setMotion( "blaster", Direction, 64, 1, -30, 32, 0.25, Ease.quadOut );
+		}
+		
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "blaster", X, Y );
 		}
