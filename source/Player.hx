@@ -166,7 +166,7 @@ class Player extends Body {
 			HXP.timeFlag();
 		}
 		
-		if ( Input.check( "c" ) ) {
+		if ( Input.check( "c" ) && Reg.GS.numArrows() > 0 ) {
 			_spriteMap.play( "arrow" );
 			acceleration.x = 0;
 			Reg.ARROW.y = y + 30;
@@ -182,7 +182,7 @@ class Player extends Body {
 			Reg.ARROW.damage = 5;
 		}
 		
-		if ( Input.released( "c" ) ) {
+		if ( Input.released( "c" ) && Reg.GS.numArrows() > 0 ) {
 			var sign:Int = 1;
 			
 			if ( _spriteMap.flipped ) {
@@ -190,6 +190,8 @@ class Player extends Body {
 			}
 			
 			Reg.ARROW.velocity.x = sign * HXP.timeFlag() * 20;
+			
+			Reg.GS.decrementArrows();
 		}
 		
 		canClimb = false;
@@ -211,14 +213,14 @@ class Player extends Body {
 	
 	public function hurt( EnemyHurt:Enemy ):Bool {
 		var xD:Int = -5;
-		var yD:Int = -5;
+		var yD:Int = 5;
 		
 		if ( EnemyHurt.mx < mx ) {
 			xD = 5;
 		}
 		
 		if ( EnemyHurt.my < my ) {
-			yD = 5;
+			yD = -5;
 		}
 		
 		var getsHurt:Bool = true;
@@ -229,7 +231,7 @@ class Player extends Body {
 					getsHurt = false;
 					xD = Std.int( xD / 5 );
 					yD = 0;
-					// play block sound
+					// todo play block sound
 				}
 			} else {
 				if ( xD > 0 ) {
@@ -242,6 +244,8 @@ class Player extends Body {
 		
 		velocity.y += xD;
 		velocity.x += yD;
+		
+		moveBy( xD, yD, "solid" );
 		
 		return getsHurt;
 	}
@@ -256,5 +260,15 @@ class Player extends Body {
 	
 	public function thornHurt():Void {
 		velocity.y = -10;
+	}
+	
+	public function hurtNinja( NinjaBox:Box ):Void {
+		if ( NinjaBox.x + NinjaBox.width < mx ) {
+			velocity.x += 30;
+		} else {
+			velocity.x -= 30;
+		}
+		
+		velocity.y -= 5;
 	}
 }

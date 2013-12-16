@@ -15,7 +15,7 @@ class Particles extends Entity {
 		var emitterMap:BitmapData = new BitmapData( 6, 2, false, 0 );
 		var emitterType1:BitmapData = new BitmapData( 2, 2, false, 0xff888800 );
 		var emitterType2:BitmapData = new BitmapData( 2, 2, false, 0xff666666 );
-		var emitterType3:BitmapData = new BitmapData( 2, 2, false, 0xff0000FF );
+		var emitterType3:BitmapData = new BitmapData( 2, 2, false, 0xffFF0000 );
 		emitterMap.draw( emitterType1 );
 		emitterMap.draw( emitterType2, new Matrix( 1, 0, 0, 1, 2, 0 ) );
 		emitterMap.draw( emitterType3, new Matrix( 1, 0, 0, 1, 4, 0 ) );
@@ -39,13 +39,13 @@ class Particles extends Entity {
 		graphic = _emitter;
 	}
 	
-	public function explosion( X:Float, Y:Float, NumParticles:Int = 256 ):Void {
+	public function explosion( X:Float, Y:Float, NumParticles:Int = 64 ):Void {
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "explosion", X, Y );
 		}
 	}
 	
-	public function smoke( X:Float, Y:Float, Direction:Int = 15, NumParticles:Int = 16 ):Void {
+	public function smoke( X:Float, Y:Float, Direction:Int = 15, NumParticles:Int = 4 ):Void {
 		_emitter.setMotion( "smoke", Direction, 50, 5, 15, -40, 1, Ease.quadOut );
 		
 		for ( i in 0...NumParticles ) {

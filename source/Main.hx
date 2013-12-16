@@ -6,7 +6,7 @@ import com.haxepunk.HXP;
 class Main extends Engine {
 	override public function init() {
 		#if debug
-		HXP.console.enable();
+		//HXP.console.enable();
 		HXP.scene = new GameScene();
 		#else
 		HXP.scene = new MenuScene();

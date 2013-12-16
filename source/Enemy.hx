@@ -19,6 +19,7 @@ class Enemy extends Body {
 	private var _enemyType:String = "";
 	private var _width:Int;
 	private var _height:Int;
+	private var _jumping:Bool = false;
 	
 	override public function new( X:Float, Y:Float, ImagePath:String, Width:Int, Height:Int ):Void {
 		super( X, Y, ImagePath, Width, Height );
@@ -34,16 +35,18 @@ class Enemy extends Body {
 		
 		// Physics
 		
-		if ( _enemyType == "ghost" ) {
-			gravity.y = 0.0;
-		} else {
-			gravity.y = 1.0;
-		}
-		
 		velocityMax.y = 20;
 		velocityMax.x = 5;
 		friction.x = 0.5;
 		friction.y = 0.5;// 0.90;
+		
+		if ( _enemyType == "ghost" ) {
+			gravity.y = 0.0;
+			friction.x = 1.0;
+			friction.y = 1.0;
+		} else {
+			gravity.y = 1.0;
+		}
 		
 		if ( _enemyType == "spike" ) {
 			velocity.x = ( Math.random() < 0.5 ) ? 1 : -1;
@@ -53,6 +56,8 @@ class Enemy extends Body {
 		// Animation
 		
 		if ( _enemyType == "ninja_sm" ) {
+			velocity.x = ( Math.random() < 0.5 ) ? 2.5 : -2.5;
+			friction.x = 1;
 			_sprite.add( "run", [ 0, 1, 2 ], 8 );
 			_sprite.play( "run" );
 		}
@@ -106,6 +111,26 @@ class Enemy extends Body {
 			if ( Math.random() < 0.01 ) {
 				velocity.x *= -1;
 			}
+		} else if ( _enemyType == "ninja_sm" ) {
+			var actChance:Float = Math.random();
+			
+			if ( actChance < 0.05 ) {
+				velocity.x *= -1;
+			}
+			
+			if ( actChance > 0.99 && _onGround ) {
+				velocity.y = -20;
+				_jumping = true;
+			}
+		}
+		
+		if ( _jumping ) {
+			_sprite.angle += 10;
+		}
+		
+		if ( _jumping && _onGround && velocity.y > 0 ) {
+			_sprite.angle = 0;
+			_jumping = false;
 		}
 		
 		super.update();

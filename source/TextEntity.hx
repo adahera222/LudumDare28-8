@@ -26,6 +26,22 @@ class TextEntity extends Entity {
 		return _text.color;
 	}
 	
+	public var scrollX(null, set):Float;
+	
+	private function set_scrollX( NewScroll:Float ):Float {
+		_text.scrollX = NewScroll;
+		
+		return _text.scrollX;
+	}
+	
+	public var scrollY(null, set):Float;
+	
+	private function set_scrollY( NewScroll:Float ):Float {
+		_text.scrollY = NewScroll;
+		
+		return _text.scrollY;
+	}
+	
 	public function new( Content:String, Size:Int = 8 ) {
 		_text = new Text( Content );
 		_text.size = Size;

@@ -24,7 +24,7 @@ class Laserbeam extends Entity {
 		_beamHasDamage = [ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false ];
 		
 		for ( i in 0...20 ) {
-			_beams.push( new Entity( 0, 0, new Image( new BitmapData( 10, 3, false, 0xff0000DD ) ) ) );
+			_beams.push( new Entity( 0, 0, new Image( new BitmapData( 10, 3, false, 0xffFF0000 ) ) ) );
 			_beams[i].visible = false;
 		}
 		

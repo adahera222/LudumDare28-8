@@ -27,9 +27,13 @@ class GameScene extends Scene {
 	private var _foreground:Entity;
 	private var _redNinja:RedNinja;
 	private var _finalBoss:FinalBoss;
+	private var _invincible:Bool = false;
+	private var _invTimer:Float = 0.0;
+	private var _arrowInd:TextEntity;
+	private var _arrows:Int = 20;
 	
 	#if debug
-	inline static private var INVINCIBLE:Bool = true;
+	inline static private var INVINCIBLE:Bool = false;
 	#end
 	
 	override public function begin():Void {
@@ -146,6 +150,13 @@ class GameScene extends Scene {
 			add( _hearts[i] );
 		}
 		
+		_arrowInd = new TextEntity( "Arrows: " + _arrows, 16 );
+		_arrowInd.x = 10;
+		_arrowInd.y = 460;
+		_arrowInd.scrollX = 0;
+		_arrowInd.scrollY = 0;
+		_arrowInd.layer = Reg.LAYER_HUD;
+		
 		Reg.PARTICLES = new Particles();
 		Reg.LASERBEAM = new Laserbeam();
 		Reg.BLASTER = new Blaster();
@@ -162,6 +173,7 @@ class GameScene extends Scene {
 		add( Reg.BLASTER );
 		add( Reg.ARROW );
 		add( _foreground );
+		add( _arrowInd );
 		
 		super.begin();
 	}
@@ -231,17 +243,7 @@ class GameScene extends Scene {
 		if ( playerHitEnemy != null ) {
 			if ( playerHitEnemy.getType() == "spider" ) {
 				_player.mint( playerHitEnemy );
-				
-				var i:Int = 0;
-				
-				while ( i <= _hearts.length - 1 ) {
-					if ( _hearts[i].visible == false ) {
-						_hearts[i].visible = true;
-						break;
-					}
-					
-					i++;
-				}
+				addAHeart();
 			} else {
 				if ( _player.hurt( playerHitEnemy ) ) {
 					takeAheart();
@@ -293,6 +295,31 @@ class GameScene extends Scene {
 			Reg.LASERBEAM.noDamage( hitEnemyBeam );
 		}
 		
+		if ( _redNinja != null ) {
+			if ( _player.fx > _redNinja.x ) {
+				if ( _player.fy > _redNinja.y ) {
+					if ( _player.x < _redNinja.fx ) {
+						if ( _player.y < _redNinja.fy ) {
+							_player.hurtNinja( new Box( _redNinja.x, _redNinja.y, _redNinja.width, _redNinja.height ) );
+						}
+					}
+				}
+			}
+		}
+		
+		if ( _invincible ) {
+			_player.visible = !_player.visible;
+			
+			_invTimer -= HXP.elapsed;
+			
+			if ( _invTimer < 0 ) {
+				_invincible = false;
+				_player.visible = true;
+			}
+		}
+		
+		_arrowInd.text = "Arrows: " + _arrows;
+		
 		#if debug
 		if ( Input.released( Key.R ) ) {
 			HXP.scene = new GameScene();
@@ -300,6 +327,9 @@ class GameScene extends Scene {
 		if ( Input.released( Key.N ) ) {
 			Reg.level ++;
 			HXP.scene = new GameScene();
+		}
+		if ( Input.released( Key.W ) ) {
+			_player.x += 500;
 		}
 		#end
 		
@@ -331,6 +361,8 @@ class GameScene extends Scene {
 		if ( INVINCIBLE ) return;
 		#end
 		
+		if ( _invincible ) return;
+		
 		var i:Int = _hearts.length - 1;
 		
 		while ( i >= 0 ) {
@@ -346,6 +378,39 @@ class GameScene extends Scene {
 			
 			i--;
 		}
+		
+		_invTimer = 2;
+		_invincible = true;
+	}
+	
+	public function decrementArrows():Void {
+		_arrows --;
+	}
+	
+	public function addArrows( AmountToAdd:Int ):Void {
+		_arrows += AmountToAdd;
+	}
+	
+	public function numArrows():Int {
+		return _arrows;
+	}
+	
+	private function addAHeart():Void {
+		if ( _invincible ) return;
+		
+		var i:Int = 0;
+		
+		while ( i <= _hearts.length - 1 ) {
+			if ( _hearts[i].visible == false ) {
+				_hearts[i].visible = true;
+				break;
+			}
+			
+			i++;
+		}
+		
+		_invTimer = 2;
+		_invincible = true;
 	}
 	
 	private function gameover():Void {
