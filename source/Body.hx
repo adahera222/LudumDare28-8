@@ -30,6 +30,18 @@ class Body extends Entity {
 		return Std.int( y + height );
 	}
 	
+	public var mx(get, null):Int;
+	
+	private function get_mx():Int {
+		return Std.int( x + width / 2 );
+	}
+	
+	public var my(get, null):Int;
+	
+	private function get_my():Int {
+		return Std.int( y + height / 2 );
+	}
+	
 	public static var solid:String = "solid";
 	
 	private var _onGround:Bool = false;

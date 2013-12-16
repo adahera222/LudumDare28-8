@@ -19,6 +19,7 @@ class Player extends Body {
 	private var _spriteMap:Spritemap;
 	private var _blaster:Sfx;
 	private var _drawTime:Float = 0.0;
+	private var _mintTimer:Int = -1;
 	
 	inline static private var MOVE_SPEED:Float = 1.0;
 	inline static private var JUMP_HEIGHT:Float = 10.0;
@@ -125,7 +126,7 @@ class Player extends Body {
 			}
 		}
 		
-		if ( Input.check( "space" ) ) {
+		if ( Input.check( "space" ) && _spriteMap.currentAnim != "arrow" ) {
 			_spriteMap.play( "blaster" );
 			
 			var posX:Int = 0;
@@ -152,7 +153,7 @@ class Player extends Body {
 			if ( Input.pressed( "space" ) ) {
 				Reg.PARTICLES.smoke( emitX, emitY, direction );
 				Reg.PARTICLES.blaster( emitX, emitY, direction + directionRange );
-				Reg.LASERBEAM.beam( emitX, emitY, direction + Std.int( directionRange / 2 ) );
+				Reg.LASERBEAM.beam( emitX, emitY, direction );
 				_blaster.play();
 			}
 			
@@ -193,11 +194,67 @@ class Player extends Body {
 		
 		canClimb = false;
 		
+		if ( _mintTimer > 0 ) {
+			_mintTimer--;
+		}
+		
+		if ( _mintTimer == 0 ) {
+			_mintTimer = -1;
+			
+			_spriteMap.color = 0xFFFFFF;
+			velocityMax.x = VELOCITY_MAX_X;
+			velocityMax.y = VELOCITY_MAX_Y;
+		}
+		
 		super.update();
 	}
 	
-	public function hurt():Void {
-		velocity.y -= 5;
-		velocity.x -= 5;
+	public function hurt( EnemyHurt:Enemy ):Bool {
+		var xD:Int = -5;
+		var yD:Int = -5;
+		
+		if ( EnemyHurt.mx < mx ) {
+			xD = 5;
+		}
+		
+		if ( EnemyHurt.my < my ) {
+			yD = 5;
+		}
+		
+		var getsHurt:Bool = true;
+		
+		if ( _spriteMap.currentAnim == "duck" ) {
+			if ( !_spriteMap.flipped ) {
+				if ( xD < 0 ) {
+					getsHurt = false;
+					xD = Std.int( xD / 5 );
+					yD = 0;
+					// play block sound
+				}
+			} else {
+				if ( xD > 0 ) {
+					getsHurt = false;
+					xD = Std.int( xD / 5 );
+					yD = 0;
+				}
+			}
+		}
+		
+		velocity.y += xD;
+		velocity.x += yD;
+		
+		return getsHurt;
+	}
+	
+	public function mint( EnemyHurt:Enemy ):Void {
+		_spriteMap.color = 0x88FF88;
+		_mintTimer = 100;
+		velocityMax.x = VELOCITY_MAX_X / 2;
+		velocityMax.y = VELOCITY_MAX_Y / 2;
+		hurt( EnemyHurt );
+	}
+	
+	public function thornHurt():Void {
+		velocity.y = -10;
 	}
 }

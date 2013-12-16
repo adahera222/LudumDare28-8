@@ -21,9 +21,10 @@ class Tiles extends Entity {
 	public var spiderPositions(default, null):Array<Point>;
 	public var ghostPositions(default, null):Array<Point>;
 	
-	// Vines
+	// Vines & Thorns
 	
 	public var vineAreas(default, null):Array<Box>;
+	public var thornAreas(default, null):Array<Box>;
 	
 	// Treasures
 	
@@ -32,6 +33,12 @@ class Tiles extends Entity {
 	// The level exit
 	
 	public var exit(default, null):Box;
+	
+	// Final level stuff
+	
+	public var bossSpawn(default, null):Point;
+	public var bigNinjaSpawn(default, null):Point;
+	public var smallNinjaSpawn(default, null):Array<Point>;
 	
 	/**
 	 * Create a tiled map.
@@ -48,10 +55,12 @@ class Tiles extends Entity {
 		spiderPositions = new Array<Point>();
 		ghostPositions = new Array<Point>();
 		vineAreas = new Array<Box>();
+		thornAreas = new Array<Box>();
 		treasurePositions = new Array<Point>();
+		smallNinjaSpawn = new Array<Point>();
 		
 		var entity:TmxEntity = new TmxEntity( MapPath );
-		entity.loadGraphic( TileSet, [ "extra background", "background", "collidable", "foreground" ] );
+		entity.loadGraphic( TileSet, [ "extra background", "background", "collidable" ] );
 		entity.loadMask( "collidable", "walls" );
 		
 		for ( object in entity.map.getObjectGroup( "objects" ).objects ) {
@@ -70,6 +79,14 @@ class Tiles extends Entity {
 					vineAreas.push( b );
 				case "treasure":
 					treasurePositions.push( new Point( object.x, object.y ) );
+				case "thorn":
+					thornAreas.push( new Box( object.x, object.y, object.width, object.height ) );
+				case "boss":
+					bossSpawn = new Point( object.x, object.y );
+				case "ninjasmall":
+					smallNinjaSpawn.push( new Point( object.x, object.y ) );
+				case "ninjabig":
+					bigNinjaSpawn = new Point( object.x, object.y );
 				case "exit":
 					exit = new Box( object.x, object.y, object.width, object.height ); 
 			}
@@ -78,5 +95,12 @@ class Tiles extends Entity {
 		graphic = entity.graphic;
 		mask = entity.mask;
 		type = "solid";
+	}
+	
+	static public function getForeground( MapPath:String, TileSet:String ):Entity {
+		var entity:TmxEntity = new TmxEntity( MapPath );
+		entity.loadGraphic( TileSet, [ "foreground" ] );
+		
+		return new Entity( 0, 0, entity.graphic );
 	}
 }

@@ -18,26 +18,40 @@ class GameScene extends Scene {
 	private var _enemies:Array<Enemy>;
 	private var _particles:Particles;
 	private var _vines:Array<Box>;
+	private var _thorns:Array<Box>;
 	private var _treasures:Array<Treasure>;
 	private var _treasureBoxes:Array<Box>;
 	private var _exit:Box;
 	private var _arrow:Arrow;
 	private var _hearts:Array<Entity>;
+	private var _foreground:Entity;
+	private var _redNinja:RedNinja;
+	private var _finalBoss:FinalBoss;
+	
+	#if debug
+	inline static private var INVINCIBLE:Bool = true;
+	#end
 	
 	override public function begin():Void {
 		Reg.GS = this;
 		
 		#if debug
-		//Reg.level = 0;
+		// Use to test a specific level
+		Reg.level = 2;
 		#end
 		
 		if ( Reg.level == 0 ) {
 			_tileMap = new Tiles( "maps/Map_03.tmx", "images/village.png" );
+			_foreground = Tiles.getForeground( "maps/Map_03.tmx", "images/village.png" );
 		} else if ( Reg.level == 1 ) {
 			_tileMap = new Tiles( "maps/Map_04.tmx", "images/forest.png" );
+			_foreground = Tiles.getForeground( "maps/Map_04.tmx", "images/forest.png" );
 		} else {
 			_tileMap = new Tiles( "maps/Map_05.tmx", "images/cave.png" );
+			_foreground = Tiles.getForeground( "maps/Map_05.tmx", "images/cave.png" );
 		}
+		
+		_foreground.layer = Reg.LAYER_FOREGROUND;
 		
 		_player = new Player( _tileMap.playerSpawn.x, _tileMap.playerSpawn.y );
 		
@@ -72,6 +86,15 @@ class GameScene extends Scene {
 			_vines.push( vine );
 		}
 		
+		// Thorns
+		
+		_thorns = new Array<Box>();
+		
+		for ( e in _tileMap.thornAreas ) {
+			var thorn:Box = new Box( e.x, e.y, e.width, e.height );
+			_thorns.push( thorn );
+		}
+		
 		// Set up treasures
 		
 		_treasures = new Array<Treasure>();
@@ -87,7 +110,27 @@ class GameScene extends Scene {
 		
 		// Set up level exit
 		
-		_exit = new Box( _tileMap.exit.x, _tileMap.exit.y, _tileMap.exit.width, _tileMap.exit.height );
+		if ( _tileMap.exit != null ) {
+			_exit = new Box( _tileMap.exit.x, _tileMap.exit.y, _tileMap.exit.width, _tileMap.exit.height );
+		}
+		
+		// Final level stuff
+		
+		if ( _tileMap.bigNinjaSpawn != null ) {
+			_redNinja = new RedNinja( _tileMap.bigNinjaSpawn.x, _tileMap.bigNinjaSpawn.y );
+			add( _redNinja );
+		}
+		
+		for ( p in _tileMap.smallNinjaSpawn ) {
+			var e:Enemy = new Enemy( p.x, p.y, "images/ninja_sm.png", 32, 40 );
+			_enemies.push ( e );
+			add( e );
+		}
+		
+		if ( _tileMap.bossSpawn != null ) {
+			_finalBoss = new FinalBoss( _tileMap.bossSpawn.x, _tileMap.bossSpawn.y );
+			add( _finalBoss );
+		}
 		
 		// Set up hearts
 		
@@ -118,6 +161,7 @@ class GameScene extends Scene {
 		add( Reg.LASERBEAM );
 		add( Reg.BLASTER );
 		add( Reg.ARROW );
+		add( _foreground );
 		
 		super.begin();
 	}
@@ -148,6 +192,13 @@ class GameScene extends Scene {
 			}
 		}
 		
+		for ( thorn in _thorns ) {
+			if ( thorn.collideWith( _player ) ) {
+				_player.thornHurt();
+				takeAheart();
+			}
+		}
+		
 		if ( _exit.collideWith( _player ) ) {
 			Reg.level++;
 			HXP.scene = new GameScene();
@@ -163,37 +214,39 @@ class GameScene extends Scene {
 		
 		// What follows is probably the cheesiest collision code ever written.
 		
-		var playerHitEnemy:Bool = false;
+		var playerHitEnemy:Enemy = null;
 		
 		for ( enemy in _enemies ) {
 			if ( _player.fx > enemy.x ) {
 				if ( _player.fy > enemy.y ) {
 					if ( _player.x < enemy.fx ) {
 						if ( _player.y < enemy.fy ) {
-							playerHitEnemy = true;
+							playerHitEnemy = enemy;
 						}
 					}
 				}
 			}
 		}
 		
-		if ( playerHitEnemy ) {
-			_player.hurt();
-			
-			var i:Int = _hearts.length - 1;
-			
-			while ( i >= 0 ) {
-				if ( _hearts[i].visible == true ) {
-					_hearts[i].visible = false;
-					break;
+		if ( playerHitEnemy != null ) {
+			if ( playerHitEnemy.getType() == "spider" ) {
+				_player.mint( playerHitEnemy );
+				
+				var i:Int = 0;
+				
+				while ( i <= _hearts.length - 1 ) {
+					if ( _hearts[i].visible == false ) {
+						_hearts[i].visible = true;
+						break;
+					}
+					
+					i++;
+				}
+			} else {
+				if ( _player.hurt( playerHitEnemy ) ) {
+					takeAheart();
 				}
 				
-				if ( i == 0 ) {
-					gameover();
-					break;
-				}
-				
-				i--;
 			}
 		}
 		
@@ -215,8 +268,37 @@ class GameScene extends Scene {
 			hitEnemy.hurt( Reg.ARROW.damage );
 		}
 		
+		var hitBeamEnemy:Enemy = null;
+		var hitEnemyBeam:Box = null;
+		
+		for ( enemy in _enemies ) {
+			for ( beam in Reg.LASERBEAM.boxes ) {
+				if ( beam.fx > enemy.x ) {
+					if ( beam.fy > enemy.y ) {
+						if ( beam.x < enemy.fx ) {
+							if ( beam.y < enemy.fy ) {
+								if ( Reg.LASERBEAM.hasDamage ( beam ) ) {
+									hitBeamEnemy = enemy;
+									hitEnemyBeam = beam;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if ( hitBeamEnemy != null ) {
+			hitBeamEnemy.hurt( 3, hitEnemyBeam );
+			Reg.LASERBEAM.noDamage( hitEnemyBeam );
+		}
+		
 		#if debug
 		if ( Input.released( Key.R ) ) {
+			HXP.scene = new GameScene();
+		}
+		if ( Input.released( Key.N ) ) {
+			Reg.level ++;
 			HXP.scene = new GameScene();
 		}
 		#end
@@ -236,6 +318,34 @@ class GameScene extends Scene {
 		remove( e );
 		_enemies.remove( e );
 		e = null;
+	}
+	
+	public var tilemap(get, null):Tiles;
+	
+	private function get_tilemap():Tiles {
+		return _tileMap;
+	}
+	
+	private function takeAheart():Void {
+		#if debug
+		if ( INVINCIBLE ) return;
+		#end
+		
+		var i:Int = _hearts.length - 1;
+		
+		while ( i >= 0 ) {
+			if ( _hearts[i].visible == true ) {
+				_hearts[i].visible = false;
+				break;
+			}
+			
+			if ( i == 0 ) {
+				gameover();
+				break;
+			}
+			
+			i--;
+		}
 	}
 	
 	private function gameover():Void {

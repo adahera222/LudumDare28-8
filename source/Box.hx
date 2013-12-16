@@ -6,6 +6,18 @@ class Box {
 	public var width:Int;
 	public var height:Int;
 	
+	public var fx(get, null):Int;
+	
+	private function get_fx():Int {
+		return x + width;
+	}
+	
+	public var fy(get, null):Int;
+	
+	private function get_fy():Int {
+		return y + height;
+	}
+	
 	public function new( X:Float, Y:Float, Width:Float, Height:Float ) {
 		x = Std.int( X );
 		y = Std.int( Y );

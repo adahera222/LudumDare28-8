@@ -39,7 +39,7 @@ class Particles extends Entity {
 		graphic = _emitter;
 	}
 	
-	public function explosion( X:Float, Y:Float, NumParticles:Int = 64 ):Void {
+	public function explosion( X:Float, Y:Float, NumParticles:Int = 256 ):Void {
 		for ( i in 0...NumParticles ) {
 			_emitter.emit( "explosion", X, Y );
 		}
