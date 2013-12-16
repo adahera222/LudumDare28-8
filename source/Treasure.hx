@@ -1,6 +1,8 @@
 package;
 
 class Treasure extends Body {
+	private var _opened:Bool = false;
+	
 	public function new( X:Float, Y:Float ) {
 		super( X, Y, "images/treasure.png", 40, 40 );
 		_sprite.add( "close", [0] );
@@ -14,8 +16,16 @@ class Treasure extends Body {
 		friction.y = 0;
 	}
 	
-	public function open():Void {
-		_sprite.play( "open" );
+	public function open():Bool {
+		var giveItem:Bool = false;
+		
+		if ( !_opened ) {
+			_sprite.play( "open" );
+			_opened = true;
+			giveItem = true;
+		}
+		
+		return giveItem;
 	}
 	
 	override public function update():Void {

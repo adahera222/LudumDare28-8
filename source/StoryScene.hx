@@ -15,6 +15,10 @@ class StoryScene extends Scene {
 	inline static private var STORY_TEXT:String = "When you are playing your name is Jack.\n\nYou start in his village.\n\nYour goal is to go to a cave and in the cave there is a monster\nyou have to fight and get this mysterious bone that is made of\ngold and diamond and get it to your grandfather. Because he is\nan archaeologist.\n\nAnd there is hidden treasure chests. And traps.\n\nYou start out with a bow with 10 arrows and\na blaster with unlimited ammo.";
 	
 	override public function begin():Void {
+		Reg.FADE = new Fade();
+		add( Reg.FADE );
+		Reg.FADE.add();
+		
 		_black = new TextEntity( STORY_TEXT, 16 );
 		_black.color = 0x000000;
 		_white = new TextEntity( STORY_TEXT, 16 );
@@ -28,6 +32,8 @@ class StoryScene extends Scene {
 		add( _white );
 		
 		super.begin();
+		
+		Reg.FADE.fadeIn( 2 );
 	}
 	
 	override public function update():Void {
@@ -35,12 +41,12 @@ class StoryScene extends Scene {
 		_black.y = _white.y + 2;
 		
 		if ( _black.y < -210 ) {
-			HXP.scene = new GameScene();
+			Reg.FADE.fadeOut( 2, function() { HXP.scene = new GameScene(); } );
 		}
 		
 		if ( Input.pressed( Key.SPACE ) ) {
 			if ( _spaceOnce ) {
-				HXP.scene = new GameScene();
+				Reg.FADE.fadeOut( 2, function() { HXP.scene = new GameScene(); } );
 			} else {
 				var t:TextEntity = new TextEntity( "Press space again to skip", 16 );
 				t.x = 300;
@@ -50,5 +56,7 @@ class StoryScene extends Scene {
 				_spaceOnce = true;
 			}
 		}
+		
+		super.update();
 	}
 }

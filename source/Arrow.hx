@@ -5,6 +5,8 @@ import com.haxepunk.Entity;
 
 class Arrow extends Body {
 	private var _damage:Int = 5;
+	private var _width:Int = 35;
+	private  var _height:Int = 10;
 	
 	public function new() {
 		super( 0, 0, "images/arrow.png", 35, 10 );
@@ -63,5 +65,9 @@ class Arrow extends Body {
 		_sprite.flipped = Flip;
 		
 		return _sprite.flipped;
+	}
+	
+	public function getBox():Box {
+		return new Box( x, y, _width, _height );
 	}
 }

@@ -12,6 +12,10 @@ class MenuScene extends Scene {
 	private var _title:Sfx;
 	
 	override public function begin():Void {
+		Reg.FADE = new Fade();
+		add( Reg.FADE );
+		Reg.FADE.add();
+		
 		var title:TextEntity = new TextEntity( "The Game of Fun", 64 );
 		title.x = 40;
 		title.y = 60;
@@ -31,12 +35,14 @@ class MenuScene extends Scene {
 		_title = new Sfx( "title" );
 		_title.play();
 		
+		
+		Reg.FADE.fadeIn( 0.5 );
 		super.begin();
 	}
 	
 	override public function update():Void {
-		if ( Input.released( Key.SPACE ) ) {
-			HXP.scene = new StoryScene();
+		if ( Input.pressed( Key.SPACE ) ) {
+			Reg.FADE.fadeOut( 0.5, function() { HXP.scene = new StoryScene(); } );
 		}
 		
 		super.update();

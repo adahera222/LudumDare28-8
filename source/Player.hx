@@ -179,7 +179,8 @@ class Player extends Body {
 			
 			Reg.ARROW.flipped = _spriteMap.flipped;
 			Reg.ARROW.visible = true;
-			Reg.ARROW.damage = 5;
+			
+			Reg.GS.setNextArrow( _spriteMap.flipped, 5 );
 		}
 		
 		if ( Input.released( "c" ) && Reg.GS.numArrows() > 0 ) {
@@ -189,7 +190,10 @@ class Player extends Body {
 				sign = -1;
 			}
 			
-			Reg.ARROW.velocity.x = sign * HXP.timeFlag() * 20;
+			Reg.ARROW.visible = false;
+			Reg.GS.launchArrow( sign * HXP.timeFlag() * 20 );
+			
+			//Reg.ARROW.velocity.x = sign * HXP.timeFlag() * 20;
 			
 			Reg.GS.decrementArrows();
 		}

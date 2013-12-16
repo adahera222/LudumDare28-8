@@ -71,9 +71,7 @@ class Enemy extends Body {
 		_health -= Damage;
 		
 		if ( Damage > 0 ) {
-			if ( HitBox == null ) {
-				Reg.PARTICLES.explosion( Reg.ARROW.x + 35, Reg.ARROW.y + 5, 16 );
-			} else {
+			if ( HitBox != null ) {
 				Reg.PARTICLES.explosion( HitBox.x + HitBox.width, HitBox.y + HitBox.height / 2, 16 );
 			}
 		}

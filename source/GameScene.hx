@@ -30,7 +30,8 @@ class GameScene extends Scene {
 	private var _invincible:Bool = false;
 	private var _invTimer:Float = 0.0;
 	private var _arrowInd:TextEntity;
-	private var _arrows:Int = 20;
+	private var _arrowGroup:Array<Arrow>;
+	private var _nextArrowLaunched:Int;
 	
 	#if debug
 	inline static private var INVINCIBLE:Bool = false;
@@ -39,9 +40,13 @@ class GameScene extends Scene {
 	override public function begin():Void {
 		Reg.GS = this;
 		
+		Reg.FADE = new Fade();
+		add( Reg.FADE );
+		Reg.FADE.add();
+		
 		#if debug
 		// Use to test a specific level
-		Reg.level = 2;
+		//Reg.level = 0;
 		#end
 		
 		if ( Reg.level == 0 ) {
@@ -150,12 +155,24 @@ class GameScene extends Scene {
 			add( _hearts[i] );
 		}
 		
-		_arrowInd = new TextEntity( "Arrows: " + _arrows, 16 );
+		// Set up arrows
+		
+		_arrowInd = new TextEntity( "Arrows: " + Reg.totalArrows, 32 );
 		_arrowInd.x = 10;
-		_arrowInd.y = 460;
+		_arrowInd.y = 444;
 		_arrowInd.scrollX = 0;
 		_arrowInd.scrollY = 0;
 		_arrowInd.layer = Reg.LAYER_HUD;
+		
+		_arrowGroup = new Array<Arrow>();
+		
+		for ( i in 0...20 ) {
+			var arr:Arrow = new Arrow();
+			_arrowGroup.push( arr );
+			arr.visible = false;
+		}
+		
+		_nextArrowLaunched = 0;
 		
 		Reg.PARTICLES = new Particles();
 		Reg.LASERBEAM = new Laserbeam();
@@ -175,8 +192,9 @@ class GameScene extends Scene {
 		add( _foreground );
 		add( _arrowInd );
 		
+		Reg.FADE.fadeIn( 1 );
 		super.begin();
-	}
+	} // end begin
 	
 	override public function update():Void {
 		HXP.camera.x = _player.x - HXP.halfWidth;
@@ -212,14 +230,16 @@ class GameScene extends Scene {
 		}
 		
 		if ( _exit.collideWith( _player ) ) {
-			Reg.level++;
-			HXP.scene = new GameScene();
+			Reg.FADE.fadeOut( 1, nextLevel );
 		}
 		
 		for ( i in 0..._treasureBoxes.length ) {
 			if ( _treasureBoxes[i].collideWith( _player ) ) {
 				if ( Input.check( Key.X ) ) {
-					_treasures[i].open();
+					if ( _treasures[i].open() ) {
+						var arrowPickup:ArrowsPlus = new ArrowsPlus( _treasures[i].x, _treasures[i].y );
+						add( arrowPickup );
+					}
 				}
 			}
 		}
@@ -228,12 +248,14 @@ class GameScene extends Scene {
 		
 		var playerHitEnemy:Enemy = null;
 		
-		for ( enemy in _enemies ) {
-			if ( _player.fx > enemy.x ) {
-				if ( _player.fy > enemy.y ) {
-					if ( _player.x < enemy.fx ) {
-						if ( _player.y < enemy.fy ) {
-							playerHitEnemy = enemy;
+		if ( !_invincible ) {
+			for ( enemy in _enemies ) {
+				if ( _player.fx > enemy.x ) {
+					if ( _player.fy > enemy.y ) {
+						if ( _player.x < enemy.fx ) {
+							if ( _player.y < enemy.fy ) {
+								playerHitEnemy = enemy;
+							}
 						}
 					}
 				}
@@ -253,13 +275,17 @@ class GameScene extends Scene {
 		}
 		
 		var hitEnemy:Enemy = null;
+		var hitArrow:Arrow = null;
 		
 		for ( enemy in _enemies ) {
-			if ( Reg.ARROW.fx > enemy.x ) {
-				if ( Reg.ARROW.fy > enemy.y ) {
-					if ( Reg.ARROW.x < enemy.fx ) {
-						if ( Reg.ARROW.y < enemy.fx ) {
-							hitEnemy = enemy;
+			for ( arrow in _arrowGroup ) {
+				if ( arrow.fx > enemy.x ) {
+					if ( arrow.fy > enemy.y ) {
+						if ( arrow.x < enemy.fx ) {
+							if ( arrow.y < enemy.fy ) {
+								hitEnemy = enemy;
+								hitArrow = arrow;
+							}
 						}
 					}
 				}
@@ -267,7 +293,7 @@ class GameScene extends Scene {
 		}
 		
 		if ( hitEnemy != null ) {
-			hitEnemy.hurt( Reg.ARROW.damage );
+			hitEnemy.hurt( hitArrow.damage, hitArrow.getBox() );
 		}
 		
 		var hitBeamEnemy:Enemy = null;
@@ -295,12 +321,14 @@ class GameScene extends Scene {
 			Reg.LASERBEAM.noDamage( hitEnemyBeam );
 		}
 		
-		if ( _redNinja != null ) {
-			if ( _player.fx > _redNinja.x ) {
-				if ( _player.fy > _redNinja.y ) {
-					if ( _player.x < _redNinja.fx ) {
-						if ( _player.y < _redNinja.fy ) {
-							_player.hurtNinja( new Box( _redNinja.x, _redNinja.y, _redNinja.width, _redNinja.height ) );
+		if ( !_invincible ) {
+			if ( _redNinja != null ) {
+				if ( _player.fx > _redNinja.x ) {
+					if ( _player.fy > _redNinja.y ) {
+						if ( _player.x < _redNinja.fx ) {
+							if ( _player.y < _redNinja.fy ) {
+								_player.hurtNinja( new Box( _redNinja.x, _redNinja.y, _redNinja.width, _redNinja.height ) );
+							}
 						}
 					}
 				}
@@ -318,7 +346,7 @@ class GameScene extends Scene {
 			}
 		}
 		
-		_arrowInd.text = "Arrows: " + _arrows;
+		_arrowInd.text = "Arrows: " + Reg.totalArrows;
 		
 		#if debug
 		if ( Input.released( Key.R ) ) {
@@ -330,6 +358,12 @@ class GameScene extends Scene {
 		}
 		if ( Input.released( Key.W ) ) {
 			_player.x += 500;
+		}
+		if ( Input.released( Key.G ) ) {
+			HXP.scene = new GameOverScene();
+		}
+		if ( Input.released( Key.T ) ) {
+			HXP.scene = new EndScene();
 		}
 		#end
 		
@@ -384,15 +418,15 @@ class GameScene extends Scene {
 	}
 	
 	public function decrementArrows():Void {
-		_arrows --;
+		Reg.totalArrows --;
 	}
 	
 	public function addArrows( AmountToAdd:Int ):Void {
-		_arrows += AmountToAdd;
+		Reg.totalArrows += AmountToAdd;
 	}
 	
 	public function numArrows():Int {
-		return _arrows;
+		return Reg.totalArrows;
 	}
 	
 	private function addAHeart():Void {
@@ -411,6 +445,34 @@ class GameScene extends Scene {
 		
 		_invTimer = 2;
 		_invincible = true;
+	}
+	
+	public function launchArrow( VelocityX:Float ):Void {
+		var arr:Arrow = _arrowGroup[ _nextArrowLaunched ];
+		arr.x = Reg.ARROW.x;
+		arr.y = Reg.ARROW.y;
+		arr.velocity.x = VelocityX;
+		
+		if ( !arr.visible ) {
+			arr.visible = true;
+			add( arr );
+		}
+		
+		_nextArrowLaunched++;
+		
+		if ( _nextArrowLaunched > 19 ) {
+			_nextArrowLaunched = 0;
+		}
+	}
+	
+	public function setNextArrow( Flipped:Bool, Damage:Int = 5 ):Void {
+		_arrowGroup[ _nextArrowLaunched ].flipped = Flipped;
+		_arrowGroup[ _nextArrowLaunched ].damage = Damage;
+	}
+	
+	public function nextLevel():Void {
+		Reg.level++;
+		HXP.scene = new GameScene();
 	}
 	
 	private function gameover():Void {
