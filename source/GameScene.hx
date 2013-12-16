@@ -10,7 +10,9 @@ import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Spritemap;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
+import flash.display.BitmapData;
 import flash.display.Sprite;
+import haxe.remoting.FlashJsConnection;
 
 class GameScene extends Scene {
 	private var _player:Player;
@@ -32,6 +34,9 @@ class GameScene extends Scene {
 	private var _arrowInd:TextEntity;
 	private var _arrowGroup:Array<Arrow>;
 	private var _nextArrowLaunched:Int;
+	private var _paused:Bool = false;
+	private var _pauseDark:Entity;
+	private var _pauseText:TextEntity;
 	
 	#if debug
 	inline static private var INVINCIBLE:Bool = false;
@@ -46,7 +51,7 @@ class GameScene extends Scene {
 		
 		#if debug
 		// Use to test a specific level
-		//Reg.level = 0;
+		Reg.level = 1;
 		#end
 		
 		if ( Reg.level == 0 ) {
@@ -82,6 +87,12 @@ class GameScene extends Scene {
 		
 		for ( e in _tileMap.ghostPositions ) {
 			var enemy:Enemy = new Enemy( e.x, e.y, "images/ghost.png", 96, 112 );
+			_enemies.push( enemy );
+			add( enemy );
+		}
+		
+		for ( e in _tileMap.smusherPositions ) {
+			var enemy:Enemy = new Enemy( e.x, e.y, "images/smusher.png", 96, 96 );
 			_enemies.push( enemy );
 			add( enemy );
 		}
@@ -183,6 +194,20 @@ class GameScene extends Scene {
 		Reg.ARROW = new Arrow();
 		Reg.ARROW.visible = false;
 		
+		var img:Image = new Image( new BitmapData( 640, 480, true, 0x88000000 ) );
+		img.scrollX = 0;
+		img.scrollY = 0;
+		_pauseDark = new Entity( 0, 0, img );
+		_pauseText = new TextEntity( "Game Paused", 32 );
+		_pauseText.scrollX = 0;
+		_pauseText.scrollY = 0;
+		_pauseText.x = 200;
+		_pauseText.y = 200;
+		_pauseDark.visible = false;
+		_pauseText.visible = false;
+		_pauseDark.layer = Reg.LAYER_FADE;
+		_pauseText.layer = Reg.LAYER_FADE;
+		
 		add( _tileMap );
 		add( _player );
 		add( Reg.PARTICLES );
@@ -191,6 +216,8 @@ class GameScene extends Scene {
 		add( Reg.ARROW );
 		add( _foreground );
 		add( _arrowInd );
+		add( _pauseDark );
+		add( _pauseText );
 		
 		Reg.FADE.fadeIn( 1 );
 		super.begin();
@@ -214,6 +241,22 @@ class GameScene extends Scene {
 		
 		if ( HXP.camera.y > _tileMap.height - 480 ) {
 			HXP.camera.y = _tileMap.height - 480;
+		}
+		
+		if ( Input.pressed( Key.P ) ) {
+			_paused = !_paused;
+			
+			if ( _paused ) {
+				_pauseDark.visible = true;
+				_pauseText.visible = true;
+			} else {
+				_pauseDark.visible = false;
+				_pauseText.visible = false;
+			}
+		}
+		
+		if ( _paused ) {
+			return;
 		}
 		
 		for ( vine in _vines ) {
@@ -250,11 +293,23 @@ class GameScene extends Scene {
 		
 		if ( !_invincible ) {
 			for ( enemy in _enemies ) {
-				if ( _player.fx > enemy.x ) {
-					if ( _player.fy > enemy.y ) {
-						if ( _player.x < enemy.fx ) {
-							if ( _player.y < enemy.fy ) {
-								playerHitEnemy = enemy;
+				if ( enemy.getType() == "smusher" ) {
+					if ( _player.fx > enemy.x - enemy.originX ) {
+						if ( _player.fy > enemy.y - enemy.originY ) {
+							if ( _player.x < enemy.x + enemy.width -  enemy.originX ) {
+								if ( _player.y < enemy.y + enemy.height - enemy.originY ) {
+									playerHitEnemy = enemy;
+								}
+							}
+						}
+					}
+				} else {
+					if ( _player.fx > enemy.x ) {
+						if ( _player.fy > enemy.y ) {
+							if ( _player.x < enemy.fx ) {
+								if ( _player.y < enemy.fy ) {
+									playerHitEnemy = enemy;
+								}
 							}
 						}
 					}
@@ -266,11 +321,13 @@ class GameScene extends Scene {
 			if ( playerHitEnemy.getType() == "spider" ) {
 				_player.mint( playerHitEnemy );
 				addAHeart();
-			} else {
-				if ( _player.hurt( playerHitEnemy ) ) {
+			} else if ( playerHitEnemy.getType() == "smusher" ) {
+				if ( playerHitEnemy.smushing() ) {
+					_player.hurt( playerHitEnemy );
 					takeAheart();
 				}
-				
+			} else if ( _player.hurt( playerHitEnemy ) ) {
+				takeAheart();
 			}
 		}
 		
@@ -477,5 +534,18 @@ class GameScene extends Scene {
 	
 	private function gameover():Void {
 		HXP.scene = new GameOverScene();
+	}
+	
+	public function gotBone():Void {
+		var flash:Flash = new Flash( endGame );
+		add( flash );
+	}
+	
+	public function endGame():Void {
+		Reg.FADE.fadeOut( 5, goToEnd );
+	}
+	
+	public function goToEnd():Void {
+		HXP.scene = new EndScene();
 	}
 }

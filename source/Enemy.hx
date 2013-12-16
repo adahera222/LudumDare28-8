@@ -3,6 +3,7 @@ package;
 import com.haxepunk.Entity;
 import com.haxepunk.Graphic;
 import com.haxepunk.graphics.Spritemap;
+import com.haxepunk.HXP;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 
@@ -20,6 +21,7 @@ class Enemy extends Body {
 	private var _width:Int;
 	private var _height:Int;
 	private var _jumping:Bool = false;
+	private var _timer:Float = 0;
 	
 	override public function new( X:Float, Y:Float, ImagePath:String, Width:Int, Height:Int ):Void {
 		super( X, Y, ImagePath, Width, Height );
@@ -61,6 +63,13 @@ class Enemy extends Body {
 			_sprite.add( "run", [ 0, 1, 2 ], 8 );
 			_sprite.play( "run" );
 		}
+		
+		if ( _enemyType == "smusher" ) {
+			_sprite.add( "idle", [0] );
+			_sprite.add( "smush", [ 1, 2, 1, 0 ], 16, false );
+			_sprite.play( "idle" );
+			setHitbox( 40, 72, -56, -24 );
+		}
 	}
 	
 	public function getType():String {
@@ -88,13 +97,15 @@ class Enemy extends Body {
 	override public function update():Void {
 		acceleration.x = acceleration.y = 0;
 		
-		if ( Reg.GS.playerX() > x ) {
-			if ( !_sprite.flipped ) {
-				_sprite.flipped = true;
-			}
-		} else {
-			if ( _sprite.flipped ) {
-				_sprite.flipped = false;
+		if ( _enemyType != "smusher" ) {
+			if ( Reg.GS.playerX() > x ) {
+				if ( !_sprite.flipped ) {
+					_sprite.flipped = true;
+				}
+			} else {
+				if ( _sprite.flipped ) {
+					_sprite.flipped = false;
+				}
 			}
 		}
 		
@@ -131,6 +142,23 @@ class Enemy extends Body {
 			_jumping = false;
 		}
 		
+		if ( _enemyType == "smusher" ) {
+			_timer += HXP.elapsed;
+			
+			if ( _timer >= 2 ) {
+				_sprite.play( "smush", true );
+				_timer = 0;
+			}
+		}
+		
 		super.update();
+	}
+	
+	public function smushing():Bool {
+		if ( _sprite.frame == 1 || _sprite.frame == 2 ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

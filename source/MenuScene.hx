@@ -1,12 +1,15 @@
 package;
 
 import com.haxepunk.Entity;
+import com.haxepunk.graphics.Image;
+import com.haxepunk.graphics.prototype.Rect;
 import com.haxepunk.graphics.Text;
 import com.haxepunk.HXP;
 import com.haxepunk.Scene;
 import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
+import flash.geom.Rectangle;
 
 class MenuScene extends Scene {
 	private var _title:Sfx;
@@ -22,14 +25,30 @@ class MenuScene extends Scene {
 		
 		var start:TextEntity = new TextEntity( "Press Space to Begin", 32 );
 		start.x = ( HXP.width - 368 ) / 2;
-		start.y = ( HXP.height - 36 ) / 2;
+		start.y = ( HXP.height - 36 ) / 2 - 50;
 		
-		var credits:TextEntity = new TextEntity( "A game for Ludum Dare 28.\nArt and concept by Burning Tiger and Burning Wheels,\nage 8 and 4, respectively.\nProgramming by Steve Richey, their dad.", 16 );
-		credits.x = 10;
-		credits.y = 400;
+		var block:Rect = new Rect( 368 + 16, 36 + 16, 0x888888 );
+		block.x = ( HXP.width - ( 368 + 16 ) ) / 2;
+		block.y = ( HXP.height - ( 36 + 16 ) ) / 2 - 50;
+		
+		var jack:Image = new Image( "images/jack.png", new Rectangle( 0, 0, 40, 80 ) );
+		jack.x = 170;
+		jack.y = start.y + 80;
+		
+		var instruction:TextEntity = new TextEntity( "Controls:\nLeft and Right - Move\nUp - Jump\nDown - Duck and Block\nSpace - Shoot Blaster\nC - Shoot Arrow\nX - Open Treasure Chest\nP - Pause Game", 16 );
+		instruction.x = jack.x + 100;
+		instruction.y = jack.y - 20;
+		instruction.color = 0xff222222;
+		
+		var credits:TextEntity = new TextEntity( "A game for Ludum Dare 28.\n\nArt, concept, and design by Burning Tiger\nand Burning Wheels, age 8 and 4, respectively.\n\nProgramming by Steve Richey, their dad.", 16 );
+		credits.x = 120;
+		credits.y = 380;
 		
 		add( title );
+		addGraphic( block );
 		add( start );
+		addGraphic( jack );
+		add( instruction );
 		add( credits );
 		
 		_title = new Sfx( "title" );

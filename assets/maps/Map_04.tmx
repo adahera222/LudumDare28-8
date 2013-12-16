@@ -49,5 +49,7 @@
   <object name="thorn" x="11504" y="1141" width="280" height="101"/>
   <object name="thorn" x="15635" y="1201" width="123" height="40"/>
   <object name="thorn" x="19629" y="781" width="165" height="307"/>
+  <object name="smusher" x="8847" y="836" width="59" height="63"/>
+  <object name="smusher" x="14976" y="1087" width="55" height="49"/>
  </objectgroup>
 </map>

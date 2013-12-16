@@ -20,6 +20,7 @@ class Tiles extends Entity {
 	public var spikePositions(default, null):Array<Point>;
 	public var spiderPositions(default, null):Array<Point>;
 	public var ghostPositions(default, null):Array<Point>;
+	public var smusherPositions(default, null):Array<Point>;
 	
 	// Vines & Thorns
 	
@@ -58,6 +59,7 @@ class Tiles extends Entity {
 		thornAreas = new Array<Box>();
 		treasurePositions = new Array<Point>();
 		smallNinjaSpawn = new Array<Point>();
+		smusherPositions = new Array<Point>();
 		
 		var entity:TmxEntity = new TmxEntity( MapPath );
 		entity.loadGraphic( TileSet, [ "extra background", "background", "collidable" ] );
@@ -87,6 +89,8 @@ class Tiles extends Entity {
 					smallNinjaSpawn.push( new Point( object.x, object.y ) );
 				case "ninjabig":
 					bigNinjaSpawn = new Point( object.x, object.y );
+				case "smusher":
+					smusherPositions.push( new Point( object.x, object.y ) );
 				case "exit":
 					exit = new Box( object.x, object.y, object.width, object.height ); 
 			}
