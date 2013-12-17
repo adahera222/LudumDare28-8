@@ -5,7 +5,6 @@ import com.haxepunk.Graphic;
 import com.haxepunk.graphics.Emitter;
 import com.haxepunk.graphics.Spritemap;
 import com.haxepunk.HXP;
-import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 
@@ -17,7 +16,6 @@ import com.haxepunk.utils.Key;
 class Player extends Body {
 	public var canClimb:Bool = false;
 	private var _spriteMap:Spritemap;
-	private var _blaster:Sfx;
 	private var _drawTime:Float = 0.0;
 	private var _mintTimer:Int = -1;
 	
@@ -62,8 +60,9 @@ class Player extends Body {
 		Input.define( "c", [ Key.C ] );
 		
 		// Sound
-		
-		_blaster = new Sfx( "blaster" );
+		#if !js
+		Reg.GS.playSound( "blaster" );
+		#end
 	}
 	
 	override public function update():Void {
@@ -156,7 +155,6 @@ class Player extends Body {
 				Reg.PARTICLES.smoke( emitX, emitY, direction );
 				Reg.PARTICLES.blaster( emitX, emitY, direction + directionRange );
 				Reg.LASERBEAM.beam( emitX, emitY, direction );
-				_blaster.play( 0.5 );
 			}
 			
 			acceleration.x = 0;

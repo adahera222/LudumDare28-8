@@ -709,7 +709,7 @@ class GameScene extends Scene {
 			case "arrow":
 				_sndArrow.play();
 			case "blaster":
-				_sndBlaster.play();
+				_sndBlaster.play( 0.25 );
 			case "boss":
 				_sndBoss.play();
 			case "bow":
