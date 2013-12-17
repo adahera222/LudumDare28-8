@@ -8,12 +8,15 @@ import com.haxepunk.Scene;
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Spritemap;
-import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import haxe.remoting.FlashJsConnection;
+
+#if !js
+import com.haxepunk.Sfx;
+#end
 
 class GameScene extends Scene {
 	private var _player:Player;
@@ -42,6 +45,7 @@ class GameScene extends Scene {
 	private var _nextfire:Int;
 	
 	// sounds
+	#if !js
 	private var _sndArrow:Sfx;
 	private var _sndBlaster:Sfx;
 	private var _sndBoss:Sfx;
@@ -59,6 +63,7 @@ class GameScene extends Scene {
 	private var _sndTreasure:Sfx;
 	private var _sndVillage:Sfx;
 	private var _sndWalk:Sfx;
+	#end
 	
 	#if debug
 	inline static private var INVINCIBLE:Bool = false;
@@ -259,6 +264,7 @@ class GameScene extends Scene {
 		
 		// Set up sounds
 		
+		#if !js
 		_sndArrow = new Sfx( "arrow" );
 		_sndBlaster = new Sfx( "blaster" );
 		_sndBoss = new Sfx( "boss" );
@@ -284,6 +290,7 @@ class GameScene extends Scene {
 		} else {
 			playSound( "cave" );
 		}
+		#end
 		
 		Reg.FADE.fadeIn( 1 );
 		super.begin();
@@ -697,6 +704,7 @@ class GameScene extends Scene {
 	}
 	
 	public function playSound( Desired:String ):Void {
+		#if !js
 		switch ( Desired ) {
 			case "arrow":
 				_sndArrow.play();
@@ -733,14 +741,21 @@ class GameScene extends Scene {
 			case "walk":
 				_sndWalk.play();
 		}
+		#end
 	}
 	
 	public function walkPlaying():Bool {
+		#if js
+		return false;
+		#else
 		return _sndWalk.playing;
+		#end
 	}
 	
 	public function stopWalk():Void {
+		#if !js
 		_sndWalk.stop();
+		#end
 	}
 	
 	public function shootFire( X:Float, Y:Float, Flipped:Bool ):Void {

@@ -18,7 +18,7 @@
 	
 	<assets path="assets/images" rename="images" include="*.png" />
 	
-	<assets path="assets/sounds" unless="flash">
+	<assets path="assets/sounds" unless="flash || js">
 		<sound path="arrow.ogg" id="arrow" />
 		<sound path="blaster.ogg" id="blaster" />
 		<sound path="boss_smash.ogg" id="boss" />

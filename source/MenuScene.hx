@@ -6,13 +6,18 @@ import com.haxepunk.graphics.prototype.Rect;
 import com.haxepunk.graphics.Text;
 import com.haxepunk.HXP;
 import com.haxepunk.Scene;
-import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 import flash.geom.Rectangle;
 
+#if !js
+import com.haxepunk.Sfx;
+#end
+
 class MenuScene extends Scene {
+	#if !js
 	private var _title:Sfx;
+	#end
 	
 	override public function begin():Void {
 		Reg.FADE = new Fade();
@@ -51,9 +56,10 @@ class MenuScene extends Scene {
 		add( instruction );
 		add( credits );
 		
+		#if !js
 		_title = new Sfx( "title" );
 		_title.play();
-		
+		#end
 		
 		Reg.FADE.fadeIn( 0.5 );
 		super.begin();
@@ -68,8 +74,10 @@ class MenuScene extends Scene {
 	}
 	
 	override public function end():Void {
+		#if !js
 		_title.stop();
 		_title = null;
+		#end
 		
 		super.end();
 	}
