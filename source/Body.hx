@@ -65,6 +65,18 @@ class Body extends Entity {
 		velocityMax = new Point();
 	}
 	
+	public var flipped(get, set):Bool;
+	
+	private function get_flipped():Bool {
+		return _sprite.flipped;
+	}
+	
+	private function set_flipped( f:Bool ):Bool {
+		_sprite.flipped = f;
+		
+		return _sprite.flipped;
+	}
+	
 	override public function moveCollideY( e:Entity ):Bool {
 		if ( velocity.y * HXP.sign( gravity.y ) > 0 ) {
 			_onGround = true;

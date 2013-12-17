@@ -55,18 +55,6 @@ class Arrow extends Body {
 		return _damage;
 	}
 	
-	public var flipped(get, set):Bool;
-	
-	private function get_flipped():Bool {
-		return _sprite.flipped;
-	}
-	
-	private function set_flipped( Flip:Bool ):Bool {
-		_sprite.flipped = Flip;
-		
-		return _sprite.flipped;
-	}
-	
 	public function getBox():Box {
 		return new Box( x, y, _width, _height );
 	}

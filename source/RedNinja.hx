@@ -55,6 +55,8 @@ class RedNinja extends Body {
 								velocity.y -= 5;
 								
 								_health -= 5;
+								
+								Reg.GS.playSound( "ninja" );
 							}
 						}
 					}
@@ -78,8 +80,7 @@ class RedNinja extends Body {
 		_jumpTime += HXP.elapsed;
 		
 		if ( _health < 0 ) {
-			Reg.GS.remove( this );
-			visible = false;
+			Reg.GS.removeNinja();
 		}
 	}
 }

@@ -82,6 +82,17 @@ class Enemy extends Body {
 		if ( Damage > 0 ) {
 			if ( HitBox != null ) {
 				Reg.PARTICLES.explosion( HitBox.x + HitBox.width, HitBox.y + HitBox.height / 2, 16 );
+				
+				switch ( _enemyType ) {
+					case "spider":
+						Reg.GS.playSound( "spider" );
+					case "ninja_sm":
+						Reg.GS.playSound( "ninja" );
+					case "spike":
+						Reg.GS.playSound( "spike" );
+					case "ghost":
+						Reg.GS.playSound( "ghost" );
+				}
 			}
 		}
 		
@@ -147,6 +158,11 @@ class Enemy extends Body {
 			
 			if ( _timer >= 2 ) {
 				_sprite.play( "smush", true );
+				
+				if ( this.onCamera ) {
+					Reg.GS.playSound( "smusher" );
+				}
+				
 				_timer = 0;
 			}
 		}

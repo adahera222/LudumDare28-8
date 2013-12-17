@@ -19,13 +19,45 @@
 	<assets path="assets/images" rename="images" include="*.png" />
 	
 	<assets path="assets/sounds" unless="flash">
-		<sound path="title.ogg" id="title" />
+		<sound path="arrow.ogg" id="arrow" />
 		<sound path="blaster.ogg" id="blaster" />
+		<sound path="boss_smash.ogg" id="boss" />
+		<sound path="bow.ogg" id="bow" />
+		<sound path="cave.ogg" id="cave" />
+		<sound path="climb.ogg" id="climb" />
+		<sound path="forest.ogg" id="forest" />
+		<sound path="ghost.ogg" id="ghost" />
+		<sound path="hurt.ogg" id="hurt" />
+		<sound path="jump.ogg" id="jump" />
+		<sound path="ninja_hurt.ogg" id="ninja" />
+		<sound path="smusher.ogg" id="smusher" />
+		<sound path="spider_jump.ogg" id="spider" />
+		<sound path="spike_hurt.ogg" id="spike" />
+		<sound path="title.ogg" id="title" />
+		<sound path="treasure.ogg" id="treasure" />
+		<sound path="village.ogg" id="village" />
+		<sound path="walk.ogg" id="walk" />
 	</assets>
 	
 	<assets path="assets/sounds" if="flash">
-		<sound path="title.mp3" id="title" />
+		<sound path="arrow.mp3" id="arrow" />
 		<sound path="blaster.mp3" id="blaster" />
+		<sound path="boss_smash.mp3" id="boss" />
+		<sound path="bow.mp3" id="bow" />
+		<sound path="cave.mp3" id="cave" />
+		<sound path="climb.mp3" id="climb" />
+		<sound path="forest.mp3" id="forest" />
+		<sound path="ghost.mp3" id="ghost" />
+		<sound path="hurt.mp3" id="hurt" />
+		<sound path="jump.mp3" id="jump" />
+		<sound path="ninja_hurt.mp3" id="ninja" />
+		<sound path="smusher.mp3" id="smusher" />
+		<sound path="spider_jump.mp3" id="spider" />
+		<sound path="spike_hurt.mp3" id="spike" />
+		<sound path="title.mp3" id="title" />
+		<sound path="treasure.mp3" id="treasure" />
+		<sound path="village.mp3" id="village" />
+		<sound path="walk.mp3" id="walk" />
 	</assets>
 	
 	<assets path="assets/font" rename="font" include="*.ttf" />

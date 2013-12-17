@@ -115,10 +115,12 @@ class Player extends Body {
 			if ( Input.pressed( "up" ) ) {
 				_spriteMap.play( "jump" );
 				acceleration.y = -JUMP_HEIGHT;
+				Reg.GS.playSound( "jump" );
 			}
 		} else {
 			if ( Input.check( "up" ) && canClimb ) {
 				acceleration.y = -MOVE_SPEED;
+				Reg.GS.playSound( "climb" );
 				
 				if ( velocity.y < -velocityMax.x ) {
 					velocity.y = -velocityMax.x;
@@ -154,7 +156,7 @@ class Player extends Body {
 				Reg.PARTICLES.smoke( emitX, emitY, direction );
 				Reg.PARTICLES.blaster( emitX, emitY, direction + directionRange );
 				Reg.LASERBEAM.beam( emitX, emitY, direction );
-				_blaster.play();
+				_blaster.play( 0.5 );
 			}
 			
 			acceleration.x = 0;
@@ -164,6 +166,10 @@ class Player extends Body {
 		
 		if ( Input.pressed( "c" ) ) {
 			HXP.timeFlag();
+			
+			if ( Reg.GS.numArrows() > 0 ) {
+				Reg.GS.playSound( "bow" );
+			}
 		}
 		
 		if ( Input.check( "c" ) && Reg.GS.numArrows() > 0 ) {
@@ -194,7 +200,7 @@ class Player extends Body {
 			Reg.GS.launchArrow( sign * HXP.timeFlag() * 20 );
 			
 			//Reg.ARROW.velocity.x = sign * HXP.timeFlag() * 20;
-			
+			Reg.GS.playSound( "arrow" );
 			Reg.GS.decrementArrows();
 		}
 		
@@ -210,6 +216,14 @@ class Player extends Body {
 			_spriteMap.color = 0xFFFFFF;
 			velocityMax.x = VELOCITY_MAX_X;
 			velocityMax.y = VELOCITY_MAX_Y;
+		}
+		
+		if ( velocity.x != 0 && onGround ) {
+			if ( !Reg.GS.walkPlaying() ) {
+				//Reg.GS.playSound( "walk" );
+			}
+		} else {
+			Reg.GS.stopWalk();
 		}
 		
 		super.update();
@@ -251,6 +265,10 @@ class Player extends Body {
 		
 		moveBy( xD, yD, "solid" );
 		
+		if ( getsHurt ) {
+			Reg.GS.playSound( "hurt" );
+		}
+		
 		return getsHurt;
 	}
 	
@@ -264,6 +282,19 @@ class Player extends Body {
 	
 	public function thornHurt():Void {
 		velocity.y = -10;
+		Reg.GS.playSound( "hurt" );
+	}
+	
+	public function hurtBoss():Bool {
+		if ( _sprite.currentAnim == "duck" ) {
+			velocity.x -= 2;
+			velocity.y -= 2;
+		} else {
+			velocity.x -= 10;
+			velocity.y -= 10;
+		}
+		
+		return ( _sprite.currentAnim == "duck" );
 	}
 	
 	public function hurtNinja( NinjaBox:Box ):Void {
@@ -272,6 +303,8 @@ class Player extends Body {
 		} else {
 			velocity.x -= 30;
 		}
+		
+		Reg.GS.playSound( "hurt" );
 		
 		velocity.y -= 5;
 	}

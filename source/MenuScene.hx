@@ -35,7 +35,7 @@ class MenuScene extends Scene {
 		jack.x = 170;
 		jack.y = start.y + 80;
 		
-		var instruction:TextEntity = new TextEntity( "Controls:\nLeft and Right - Move\nUp - Jump\nDown - Duck and Block\nSpace - Shoot Blaster\nC - Shoot Arrow\nX - Open Treasure Chest\nP - Pause Game", 16 );
+		var instruction:TextEntity = new TextEntity( "Controls:\nLeft and Right - Move\nUp - Jump or Climb Vines\nDown - Duck and Block\nSpace - Shoot Blaster\nC - Shoot Arrow\nX - Open Treasure Chest\nP - Pause Game", 16 );
 		instruction.x = jack.x + 100;
 		instruction.y = jack.y - 20;
 		instruction.color = 0xff222222;

@@ -21,6 +21,7 @@ class Treasure extends Body {
 		
 		if ( !_opened ) {
 			_sprite.play( "open" );
+			Reg.GS.playSound( "treasure" );
 			_opened = true;
 			giveItem = true;
 		}

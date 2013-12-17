@@ -4,6 +4,7 @@ import com.haxepunk.HXP;
 
 class Reg {
 	static public var level:Int = 0;
+	
 	static public var totalArrows:Int = 20;
 	
 	static public var GS:GameScene;

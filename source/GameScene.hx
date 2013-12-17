@@ -8,6 +8,7 @@ import com.haxepunk.Scene;
 import com.haxepunk.Entity;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Spritemap;
+import com.haxepunk.Sfx;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Key;
 import flash.display.BitmapData;
@@ -37,6 +38,27 @@ class GameScene extends Scene {
 	private var _paused:Bool = false;
 	private var _pauseDark:Entity;
 	private var _pauseText:TextEntity;
+	private var _fireArray:Array<Body>;
+	private var _nextfire:Int;
+	
+	// sounds
+	private var _sndArrow:Sfx;
+	private var _sndBlaster:Sfx;
+	private var _sndBoss:Sfx;
+	private var _sndBow:Sfx;
+	private var _sndCave:Sfx;
+	private var _sndClimb:Sfx;
+	private var _sndForest:Sfx;
+	private var _sndGhost:Sfx;
+	private var _sndHurt:Sfx;
+	private var _sndJump:Sfx;
+	private var _sndNinja:Sfx;
+	private var _sndSmusher:Sfx;
+	private var _sndSpider:Sfx;
+	private var _sndSpike:Sfx;
+	private var _sndTreasure:Sfx;
+	private var _sndVillage:Sfx;
+	private var _sndWalk:Sfx;
 	
 	#if debug
 	inline static private var INVINCIBLE:Bool = false;
@@ -51,7 +73,7 @@ class GameScene extends Scene {
 		
 		#if debug
 		// Use to test a specific level
-		Reg.level = 1;
+		Reg.level = 2;
 		#end
 		
 		if ( Reg.level == 0 ) {
@@ -152,6 +174,22 @@ class GameScene extends Scene {
 			add( _finalBoss );
 		}
 		
+		if ( _finalBoss != null ) {
+			_nextfire = 0;
+			_fireArray = new Array<Body>();
+			
+			for ( i in 0...10 ) {
+				var ent:Body = new Body( 2200, 0, new Image( "images/bossfire.png" ), 63, 63 );
+				ent.visible = false;
+				ent.velocity.x = 3;
+				ent.velocity.y = 3;
+				ent.setHitbox( 63, 63, 0, 0 );
+				_fireArray.push( ent );
+				_fireArray[i].layer = Reg.LAYER_ENEMY;
+				add( _fireArray[i] );
+			}
+		}
+		
 		// Set up hearts
 		
 		_hearts = new Array<Entity>();
@@ -218,6 +256,34 @@ class GameScene extends Scene {
 		add( _arrowInd );
 		add( _pauseDark );
 		add( _pauseText );
+		
+		// Set up sounds
+		
+		_sndArrow = new Sfx( "arrow" );
+		_sndBlaster = new Sfx( "blaster" );
+		_sndBoss = new Sfx( "boss" );
+		_sndBow = new Sfx( "bow" );
+		_sndCave = new Sfx( "cave" );
+		_sndClimb = new Sfx( "climb" );
+		_sndForest = new Sfx( "forest" );
+		_sndGhost = new Sfx( "ghost" );
+		_sndHurt = new Sfx( "hurt" );
+		_sndJump = new Sfx( "jump" );
+		_sndNinja = new Sfx( "ninja" );
+		_sndSmusher = new Sfx( "smusher" );
+		_sndSpider = new Sfx( "spider" );
+		_sndSpike = new Sfx( "spike" );
+		_sndTreasure = new Sfx( "treasure" );
+		_sndVillage = new Sfx( "village" );
+		_sndWalk = new Sfx( "walk" );
+		
+		if ( Reg.level == 0 ) {
+			playSound( "village" );
+		} else if ( Reg.level == 1 ) {
+			playSound( "forest" );
+		} else {
+			playSound( "cave" );
+		}
 		
 		Reg.FADE.fadeIn( 1 );
 		super.begin();
@@ -403,6 +469,77 @@ class GameScene extends Scene {
 			}
 		}
 		
+		// FINAL BOSS
+		
+		if ( _finalBoss != null ) {
+			for ( arrow in _arrowGroup ) {
+				if ( _finalBoss != null ) {
+					if ( arrow.fx > _finalBoss.x ) {
+						if ( _finalBoss != null ) {
+							if ( arrow.fy > _finalBoss.y ) {
+								if ( _finalBoss != null ) {
+									if ( arrow.x < _finalBoss.fx ) {
+										if ( _finalBoss != null ) {
+											if ( arrow.y < _finalBoss.fy ) {
+												_finalBoss.hurt( arrow.damage );
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			for ( beam in Reg.LASERBEAM.boxes ) {
+				if ( beam.fx > _finalBoss.x ) {
+					if ( beam.fy > _finalBoss.y ) {
+						if ( beam.x < _finalBoss.x + _finalBoss.getWidth() ) {
+							if ( beam.y < _finalBoss.y + _finalBoss.getHeight() ) {
+								if ( Reg.LASERBEAM.hasDamage ( beam ) ) {
+									_finalBoss.hurt( 2.5 );
+									Reg.LASERBEAM.noDamage( beam );
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if ( !_invincible ) {
+				if ( _finalBoss != null ) {
+					if ( _player.fx > _finalBoss.x ) {
+						if ( _player.fy > _finalBoss.y ) {
+							if ( _player.x < _finalBoss.fx ) {
+								if ( _player.y < _finalBoss.fy ) {
+									takeAheart();
+									
+									if ( _player.hurtBoss() ) {
+										takeAheart();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			/*
+			for ( f in _fireArray ) {
+				if ( f.visible ) {
+					f.moveBy( f.velocity.x, f.velocity.y );
+				}
+				var b:Box = new Box( f.x, f.y, 63, 63 );
+				if ( b.collideWith( _player ) ) {
+					takeAheart;
+					
+					if ( _player.hurtBoss() ) {
+						takeAheart;
+					}
+				}
+			}*/
+		}
+		
 		_arrowInd.text = "Arrows: " + Reg.totalArrows;
 		
 		#if debug
@@ -422,6 +559,9 @@ class GameScene extends Scene {
 		if ( Input.released( Key.T ) ) {
 			HXP.scene = new EndScene();
 		}
+		if ( Input.released( Key.K ) ) {
+			_finalBoss.hurt( 199 );
+		}
 		#end
 		
 		super.update();
@@ -439,6 +579,13 @@ class GameScene extends Scene {
 		remove( e );
 		_enemies.remove( e );
 		e = null;
+	}
+	
+	public function removeNinja():Void {
+		if ( _redNinja != null ) {
+			remove( _redNinja );
+			_redNinja = null;
+		}
 	}
 	
 	public var tilemap(get, null):Tiles;
@@ -547,5 +694,78 @@ class GameScene extends Scene {
 	
 	public function goToEnd():Void {
 		HXP.scene = new EndScene();
+	}
+	
+	public function playSound( Desired:String ):Void {
+		switch ( Desired ) {
+			case "arrow":
+				_sndArrow.play();
+			case "blaster":
+				_sndBlaster.play();
+			case "boss":
+				_sndBoss.play();
+			case "bow":
+				_sndBow.play();
+			case "cave":
+				_sndCave.play();
+			case "climb":
+				_sndClimb.play();
+			case "forest":
+				_sndForest.play();
+			case "ghost":
+				_sndGhost.play();
+			case "hurt":
+				_sndHurt.play();
+			case "jump":
+				_sndJump.play();
+			case "ninja":
+				_sndNinja.play();
+			case "smusher":
+				_sndSmusher.play();
+			case "spider":
+				_sndSpider.play();
+			case "spike":
+				_sndSpike.play();
+			case "treasure":
+				_sndTreasure.play();
+			case "village":
+				_sndVillage.play();
+			case "walk":
+				_sndWalk.play();
+		}
+	}
+	
+	public function walkPlaying():Bool {
+		return _sndWalk.playing;
+	}
+	
+	public function stopWalk():Void {
+		_sndWalk.stop();
+	}
+	
+	public function shootFire( X:Float, Y:Float, Flipped:Bool ):Void {
+		_fireArray[ _nextfire ].x = X;
+		_fireArray[ _nextfire ].y = Y;
+		//_fireArray[ _nextfire ].flipped = Flipped;
+		_fireArray[ _nextfire ].visible = true;
+		
+		if ( _player.x < X ) {
+			_fireArray[ _nextfire ].velocity.x = -2;
+		}
+		
+		_fireArray[ _nextfire ].velocity.y = Math.abs( _player.x - X ) / Math.abs( _player.y - Y );
+		
+		_nextfire ++;
+		
+		if ( _nextfire > 8 ) {
+			_nextfire = 0;
+		}
+	}
+	
+	public function removeBoss():Void {
+		if ( _finalBoss != null ) {
+			remove( _finalBoss );
+			_finalBoss = null;
+		}
 	}
 }
